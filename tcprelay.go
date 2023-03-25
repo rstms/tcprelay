@@ -11,6 +11,8 @@ import (
 	"time"
 )
 
+const VERSION string = "0.0.1"
+
 func die(msg string) {
 	fmt.Fprintf(os.Stderr, "Error: %s\n", msg)
 	os.Exit(-1)
@@ -21,9 +23,9 @@ func relay(session int, verbose bool, direction string, i_conn, o_conn *net.TCPC
 	label := fmt.Sprintf("[%d] %s%s%s", session, i_conn.RemoteAddr(), direction, o_conn.RemoteAddr())
 	go func() {
 		defer func() {
-		    if verbose {
-			fmt.Printf("%s end\n", label)
-		    }
+			if verbose {
+				fmt.Printf("%s end\n", label)
+			}
 			active <- false
 		}()
 		if verbose {
@@ -133,7 +135,9 @@ func flag_arg(flag *string, name, env_var, suffix string, require bool) (value s
 }
 
 func main() {
+	quiet := flag.Bool("quiet", false, "suppress non-error output")
 	verbose := flag.Bool("verbose", false, "output connection state changes")
+	version := flag.Bool("version", false, "output version")
 	ipv4 := flag.Bool("4", false, "specify IPV4")
 	ipv6 := flag.Bool("6", false, "specify IPV6")
 	lhost := flag.String("lhost", "", "local listen host (optional)")
@@ -141,18 +145,23 @@ func main() {
 	rhost := flag.String("rhost", "127.0.0.1", "remote host")
 	rport := flag.String("rport", "", "remote port")
 	flag.Parse()
+
+	if *version {
+		fmt.Printf("tcprelay v%s\n", VERSION)
+		os.Exit(0)
+	}
+
 	local_addr := flag_arg(lhost, "lhost", "RELAY_LOCAL_HOST", ":", false)
 	local_addr += flag_arg(lport, "lport", "RELAY_LOCAL_PORT", "", true)
 	remote_addr := flag_arg(rhost, "rhost", "RELAY_REMOTE_HOST", ":", true)
 	remote_addr += flag_arg(rport, "rport", "RELAY_REMOTE_PORT", "", true)
 
-	if *lhost == *rhost && *lport == *rport {
+	if (*lhost == *rhost || (*lhost == "" && *rhost == "127.0.0.1")) && *lport == *rport {
 		die("Ouroboros. Interesting, but no.")
 	}
 
-	if *verbose {
-
-		fmt.Printf("Listening for connections on %s for relay to %s\n", local_addr, remote_addr)
+	if !*quiet {
+		fmt.Printf("Listening on %s for relay to %s\n", local_addr, remote_addr)
 	}
 
 	network := "tcp"
