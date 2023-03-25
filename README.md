@@ -33,13 +33,14 @@ Usage of ./tcprelay:
 Linux phobos 4.19.0-21-amd64 #1 SMP Debian 4.19.249-2 (2022-06-30) x86_64 GNU/Linux
 ```
 
-## build command
+## install from source:
 ```
-go fmt && go build
+make build && make install
 ```
 
-## installation link:
+## download release:
 ```
+curl -L https://github.com/rstms/tcprelay/releases/download/v0.0.1/tcprelay -o tcprelay
 ```
 
 ## Note
