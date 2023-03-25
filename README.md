@@ -6,26 +6,30 @@ a simple tcp relay with no runtime depenencies
 I wanted to use socat in a docker container built without the required libraries; this produced no joy.  This is my solution.
 
 ## example:
-This listens for and accepts connections to port 2222 on your local machine, relaying as connects to port 22 on remotebox
+listen for and accept connections to port 2222 on the local machine, connecting each to listening port 22 on host 'remotebox'
 ```
 tcprelay -lport 2222 -rhost remotebox -rport 22
 ```
 
 ## options:
 ```
-Usage of ./tcprelay:
+Usage of tcprelay:
   -4	specify IPV4
   -6	specify IPV6
   -lhost string
     	local listen host (optional)
   -lport string
     	local listen port
+  -quiet
+    	suppress non-error output
   -rhost string
     	remote host (default "127.0.0.1")
   -rport string
     	remote port
   -verbose
     	output connection state changes
+  -version
+    	output version
 ```
 
 ## built and tested on: 
